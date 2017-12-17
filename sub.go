@@ -1,9 +1,9 @@
 package gmnet
 
 import (
-	"fmt"
+	//"fmt"
 	"net"
-	"sync.atomic"
+	//"sync/atomic"
 )
 
 const (
@@ -22,7 +22,8 @@ func (s *sub) onRecv(data []byte, c *net.Conn) {
 	s.buffer <- data
 }
 
-func NewSubscribe() (s *sub) {
+func NewSubscribe() *sub {
 	s := &sub{buffer: make(chan []byte, 10)}
 	go s.receiveLoop()
+	return s
 }

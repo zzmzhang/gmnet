@@ -1,9 +1,9 @@
 package gmnet
 
 import (
-	"fmt"
-	"net"
-	"sync.atomic"
+	//"fmt"
+	//"net"
+	"sync/atomic"
 )
 
 const (
@@ -35,8 +35,9 @@ func (p *pub) sendingLoop() {
 }
 
 // NewSocket generate a new socket
-func NewSocket() (p *pub) {
+func NewSocket() *pub {
 	p := &pub{buffer: make(chan []byte, 10),
 		status: pubInit}
 	go p.sendingLoop()
+	return p
 }
