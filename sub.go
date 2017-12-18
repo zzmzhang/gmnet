@@ -12,17 +12,19 @@ const (
 	subStop
 )
 
-type sub struct {
+// Sub socket
+type Sub struct {
 	buffer chan []byte
 	*connector
 	status int32
 }
 
-func (s *sub) onRecv(data []byte, c *net.Conn) {
+func (s *Sub) onRecv(data []byte, c *net.Conn) {
 	s.buffer <- data
 }
 
-func NewSubscribe() *sub {
+// NewSubscribe returns a new subscriber
+func NewSubscribe() *Sub {
 	s := &sub{buffer: make(chan []byte, 10)}
 	go s.receiveLoop()
 	return s

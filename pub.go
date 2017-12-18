@@ -12,18 +12,19 @@ const (
 	pubStop
 )
 
-type pub struct {
+// Pub socket
+type Pub struct {
 	*listener
 	buffer chan []byte
 	status int32
 }
 
 // Send publish message
-func (p *pub) Send(msg []byte) (err error) {
+func (p *Pub) Send(msg []byte) (err error) {
 	buffer <- msg
 }
 
-func (p *pub) sendingLoop() {
+func (p *Pub) sendingLoop() {
 	for pubStop != atomic.LoadInt32(&p.status) {
 		b := <-p.buffer
 		mu.RLock()
@@ -35,7 +36,7 @@ func (p *pub) sendingLoop() {
 }
 
 // NewSocket generate a new socket
-func NewSocket() *pub {
+func NewSocket() *Pub {
 	p := &pub{buffer: make(chan []byte, 10),
 		status: pubInit}
 	go p.sendingLoop()
