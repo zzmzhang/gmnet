@@ -35,7 +35,7 @@ func newListener() (l *listener) {
 		for {
 			key := <-l.closeSig
 			l.mu.Lock()
-			delete(connHash, key)
+			delete(l.connHash, key)
 			l.mu.Unlock()
 		}
 	}(l)
