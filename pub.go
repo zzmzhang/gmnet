@@ -1,8 +1,8 @@
 package gmnet
 
 import (
-	//"fmt"
-	//"net"
+	"fmt"
+	"net"
 	"sync/atomic"
 )
 
@@ -19,9 +19,17 @@ type Pub struct {
 	status int32
 }
 
-// Send publish message
-func (p *Pub) Send(msg []byte) {
+func (p *Pub) onRecv(data []byte, c *net.Conn) {
+	fmt.Println(data)
+}
+
+func (p *Pub) Recv(data []byte) (n int, err error) {
+	return 0, nil
+}
+
+func (p *Pub) Send(msg []byte) (n int, err error) {
 	p.buffer <- msg
+	return len(msg), nil
 }
 
 func (p *Pub) sendingLoop() {

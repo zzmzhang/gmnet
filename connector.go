@@ -58,6 +58,6 @@ func (con *connector) ConnSession(c net.Conn, hashKey string, closeSig chan stri
 		return
 	}
 	msg := buf[:n]
-	con.onRecv(msg, &c)
+	con.onRecv(msg, c)
 	fmt.Printf("connSession recv:%+v\n", msg)
 }

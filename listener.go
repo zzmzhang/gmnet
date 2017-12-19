@@ -43,8 +43,6 @@ func newListener() (l *listener) {
 	return
 }
 
-type onRecvHandler func(data []byte, c *net.Conn)
-
 func (l *listener) GetConnHash(m map[string]net.Conn) {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
@@ -67,7 +65,7 @@ func (l *listener) ConnSession(c net.Conn, hashKey string, closeSig chan string)
 			return
 		}
 		msg := buf[:n]
-		l.onRecv(msg, &c)
+		l.onRecv(msg, c)
 		fmt.Printf("connSession recv:%+v\n", msg)
 	}
 }

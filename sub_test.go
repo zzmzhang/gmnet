@@ -10,7 +10,8 @@ func TestSubFunc(t *testing.T) {
 	fmt.Println("TestSubFunc")
 	sub := NewSubscribe()
 	for i := 1; i < 10; i++ {
-		msg := <-sub.buffer
+		var msg []byte
+		sub.Recv(msg)
 		fmt.Println(msg)
 	}
 }
