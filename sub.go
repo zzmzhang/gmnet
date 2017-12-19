@@ -25,7 +25,6 @@ func (s *Sub) onRecv(data []byte, c *net.Conn) {
 
 // NewSubscribe returns a new subscriber
 func NewSubscribe() *Sub {
-	s := &sub{buffer: make(chan []byte, 10)}
-	go s.receiveLoop()
+	s := &Sub{buffer: make(chan []byte, 10)}
 	return s
 }

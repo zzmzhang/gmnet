@@ -2,6 +2,7 @@ package gmnet
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -21,7 +22,7 @@ type listener struct {
 	ln      net.Listener
 
 	mu       sync.RWMutex
-	connHash map[string]*net.Conn
+	connHash map[string]net.Conn
 
 	closeSig chan string
 
@@ -44,15 +45,15 @@ func newListener() (l *listener) {
 
 type onRecvHandler func(data []byte, c *net.Conn)
 
-func (l *listener) GetConnHash(m map[string]*net.Conn) {
-	mu.RLock()
-	defer mu.RUnlock()
-	for k, v := range connHash {
+func (l *listener) GetConnHash(m map[string]net.Conn) {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+	for k, v := range l.connHash {
 		m[k] = v
 	}
 }
 
-func (l *listener) ConnSession(c *net.Conn, haskKey string, closeSig chan string) {
+func (l *listener) ConnSession(c net.Conn, hashKey string, closeSig chan string) {
 	for {
 		// TODO handler multi message after the format of message is confirmed.
 		buf := make([]byte, 1024)
@@ -66,7 +67,7 @@ func (l *listener) ConnSession(c *net.Conn, haskKey string, closeSig chan string
 			return
 		}
 		msg := buf[:n]
-		onRecv(msg, c)
+		l.onRecv(msg, &c)
 		fmt.Printf("connSession recv:%+v\n", msg)
 	}
 }
@@ -91,8 +92,8 @@ func (l *listener) listening() {
 		}
 
 		remoteAddr := c.RemoteAddr().String()
-		l.connHash[remoteAddr] = &c
-		go l.ConnSession(&c, remoteAddr, closeSig)
+		l.connHash[remoteAddr] = c
+		go l.ConnSession(c, remoteAddr, l.closeSig)
 	}
 }
 

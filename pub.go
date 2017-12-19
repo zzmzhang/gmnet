@@ -20,16 +20,16 @@ type Pub struct {
 }
 
 // Send publish message
-func (p *Pub) Send(msg []byte) (err error) {
-	buffer <- msg
+func (p *Pub) Send(msg []byte) {
+	p.buffer <- msg
 }
 
 func (p *Pub) sendingLoop() {
 	for pubStop != atomic.LoadInt32(&p.status) {
 		b := <-p.buffer
-		mu.RLock()
-		defer mu.RUnlock()
-		for k, v := range connHash {
+		p.mu.RLock()
+		defer p.mu.RUnlock()
+		for _, v := range p.connHash {
 			v.Write(b)
 		}
 	}
@@ -37,7 +37,7 @@ func (p *Pub) sendingLoop() {
 
 // NewSocket generate a new socket
 func NewSocket() *Pub {
-	p := &pub{buffer: make(chan []byte, 10),
+	p := &Pub{buffer: make(chan []byte, 10),
 		status: pubInit}
 	go p.sendingLoop()
 	return p
